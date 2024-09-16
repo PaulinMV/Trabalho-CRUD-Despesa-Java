@@ -695,7 +695,6 @@ class Arquivo {
         }
     }
 
-    // CORRIGIR METODO CONSTRUTOR QUE ACUSA ERRO
     public static void carregarArquivoDespesa(List<Despesa> listaDespesas) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("../despesas.txt"));
