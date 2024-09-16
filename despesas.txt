@@ -1,0 +1,1 @@
+Despesa{descricao='busao', valor=500.0, dataVencimento='2024-09-15', categoria='Transporte', statusPagamento=false}

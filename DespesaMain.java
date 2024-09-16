@@ -1,4 +1,10 @@
-//Importação de bibliotecas utilizadas.
+// Importação de bibliotecas utilizadas.
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -10,8 +16,7 @@ interface Pagavel {
 }
 
 // Classe responsável por definir o que uma despesa DEVE conter.
-public abstract class Despesa implements Pagavel {
-
+abstract class Despesa implements Pagavel {
     private String descricao;
     private Float valor;
     private String dataVencimento;
@@ -19,7 +24,7 @@ public abstract class Despesa implements Pagavel {
     private boolean statusPagamento;
 
     // Método construtor 
-    Despesa(String descricao, Float valor, String dataVencimento, String categoria) {
+    Despesa(String descricao, Float valor, String dataVencimento, String categoria, boolean statusPagamento) {
         this.descricao = descricao;
         this.valor = valor;
         this.dataVencimento = dataVencimento;
@@ -27,14 +32,14 @@ public abstract class Despesa implements Pagavel {
         this.statusPagamento = false;
     }
 
-    // Métodos de sobrescrita da interfaces
+    // Métodos de sobrescrita da interface
     @Override
     public boolean pagar() {
         if (!this.statusPagamento) {
             this.statusPagamento = true;
             return true; // Pagamento realizado.
         }
-        return false; // Quando a despesa já estaviver paga.
+        return false; // Quando a despesa já está paga.
     }
 
     @Override
@@ -97,53 +102,71 @@ public abstract class Despesa implements Pagavel {
 
 // Subclasses que herdam de Despesa.
 class Transporte extends Despesa {
-
-    Transporte(String descricao, Float valor, String dataVencimento) {
-        super(descricao, valor, dataVencimento, "Transporte");
+    Transporte(String descricao, Float valor, String dataVencimento, boolean statusPagamento) {
+        super(descricao, valor, dataVencimento, "Transporte", statusPagamento);
     }
 }
 
 class Alimentacao extends Despesa {
-
-    Alimentacao(String descricao, Float valor, String dataVencimento) {
-        super(descricao, valor, dataVencimento, "Alimentação");
+    Alimentacao(String descricao, Float valor, String dataVencimento, boolean statusPagamento) {
+        super(descricao, valor, dataVencimento, "Alimentação", statusPagamento);
     }
 }
 
 class Moradia extends Despesa {
-
-    Moradia(String descricao, Float valor, String dataVencimento) {
-        super(descricao, valor, dataVencimento, "Moradia");
+    Moradia(String descricao, Float valor, String dataVencimento, boolean statusPagamento) {
+        super(descricao, valor, dataVencimento, "Moradia", statusPagamento);
     }
 }
 
 class Lazer extends Despesa {
-
-    Lazer(String descricao, Float valor, String dataVencimento) {
-        super(descricao, valor, dataVencimento, "Lazer");
+    Lazer(String descricao, Float valor, String dataVencimento, boolean statusPagamento) {
+        super(descricao, valor, dataVencimento, "Lazer", statusPagamento);
     }
 }
 
 class Saude extends Despesa {
-
-    Saude(String descricao, Float valor, String dataVencimento) {
-        super(descricao, valor, dataVencimento, "Saúde");
+    Saude(String descricao, Float valor, String dataVencimento, boolean statusPagamento) {
+        super(descricao, valor, dataVencimento, "Saúde", statusPagamento);
     }
 }
 
 class Outros extends Despesa {
+    Outros(String descricao, Float valor, String dataVencimento, boolean statusPagamento) {
+        super(descricao, valor, dataVencimento, "Outros", statusPagamento);
+    }
+}
 
-    Outros(String descricao, Float valor, String dataVencimento) {
-        super(descricao, valor, dataVencimento, "Outros");
+// Classe User
+class User {
+    private String login;
+    private String senha;
+
+    // Construtor
+    User(String login, String senha) {
+        this.login = login;
+        this.senha = senha;
+    }
+
+    // Métodos get
+    public String getLogin() {
+        return login;
+    }
+
+    public String getSenha() {
+        return senha;
     }
 }
 
 // Classe CRUD responsável pelo gerenciamento de despesas.
 class CrudDespesa {
-
     // Array que armazena qualquer variável que seja do tipo Despesa.
     List<Despesa> listaDespesas = new ArrayList<>();
     Despesa despesa = null;
+
+    public CrudDespesa() {
+        this.listaDespesas = new ArrayList<>();
+    }
 
     // Método de pagamento de despesa.
     public void pagarDespesa(int index) {
@@ -161,7 +184,6 @@ class CrudDespesa {
 
     // Método CRUD de criação de Despesa de acordo com a categoria selecionada.
     public void criarDespesa() {
-        String categoria;
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("----- CRIAR DESPESA -----");
@@ -187,33 +209,35 @@ class CrudDespesa {
         System.out.println("5. Saúde");
         System.out.println("6. Outros");
 
+        boolean statusPagamento = false;
+
         int opcao = scanner.nextInt();
         scanner.nextLine();
 
         switch (opcao) {
             case 1: // Alimentação
                 System.out.println("Criando despesa do tipo Alimentação...");
-                despesa = new Alimentacao(descricao, valor, dataVencimento);
+                despesa = new Alimentacao(descricao, valor, dataVencimento, statusPagamento);
                 break;
             case 2: // Transporte
                 System.out.println("Criando despesa do tipo Transporte...");
-                despesa = new Transporte(descricao, valor, dataVencimento);
+                despesa = new Transporte(descricao, valor, dataVencimento, statusPagamento);
                 break;
             case 3: // Moradia
                 System.out.println("Criando despesa do tipo Moradia...");
-                despesa = new Moradia(descricao, valor, dataVencimento);
+                despesa = new Moradia(descricao, valor, dataVencimento, statusPagamento);
                 break;
             case 4: // Lazer
                 System.out.println("Criando despesa do tipo Lazer...");
-                despesa = new Lazer(descricao, valor, dataVencimento);
+                despesa = new Lazer(descricao, valor, dataVencimento, statusPagamento);
                 break;
             case 5: // Saúde
                 System.out.println("Criando despesa do tipo Saúde...");
-                despesa = new Saude(descricao, valor, dataVencimento);
+                despesa = new Saude(descricao, valor, dataVencimento, statusPagamento);
                 break;
             case 6: // Outros
                 System.out.println("Criando despesa do tipo Outros...");
-                despesa = new Outros(descricao, valor, dataVencimento);
+                despesa = new Outros(descricao, valor, dataVencimento, statusPagamento);
                 break;
             default:
                 System.out.println("Opção inválida. Nenhuma despesa criada.");
@@ -229,7 +253,9 @@ class CrudDespesa {
         Scanner scanner = new Scanner(System.in);
         System.out.println("----- EDITAR DESPESA -----");
 
-        System.out.println("Insira o número da Despesa a editar (1-" + listaDespesas.size() + "):");
+        System.out.println("Insira o número da Despesa a editar:\n");
+        for (int i = 0; i < listaDespesas.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDespesas.get(i));
         int indiceDespesa = scanner.nextInt() - 1;
         scanner.nextLine();
 
@@ -247,7 +273,7 @@ class CrudDespesa {
         System.out.println("Insira a nova descrição:\n(Deixe em branco para não alterar)");
         String novaDescricao = scanner.nextLine();
 
-        //Verifica se a descrição está em branco.
+        // Verifica se a descrição está em branco.
         if (!novaDescricao.isEmpty()) {
             despesa.setDescricao(novaDescricao);
         }
@@ -257,7 +283,7 @@ class CrudDespesa {
         Float novoValor = scanner.nextFloat();
         scanner.nextLine();
 
-        //Verifica se o valor é 0.
+        // Verifica se o valor é 0.
         if (novoValor != 0) {
             despesa.setValor(novoValor);
         }
@@ -266,20 +292,23 @@ class CrudDespesa {
         System.out.println("Insira a nova data de vencimento:\n(Deixe em branco para não alterar)");
         String novoVencimento = scanner.nextLine();
 
-        //Verifica se o vencimento está em branco.
+        // Verifica se o vencimento está em branco.
         if (!novoVencimento.isEmpty()) {
             despesa.setDataVencimento(novoVencimento);
         }
 
         System.out.println("Despesa atualizada: " + despesa);
+        }
     }
 
     // Método CRUD para listar despesas por status de pagamento e dentro de um período específico.
     public void listarDespesas() { 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("----- LISTAR DESPESA -----");
+        System.out.println("----- LISTAR DESPESAS -----");
 
-        System.out.println("Listar despesas por:\n1. Pagas\n2. Pendentes");
+        System.out.println("Escolha o filtro para listagem:");
+        System.out.println("1. Listar apenas despesas pagas");
+        System.out.println("2. Listar apenas despesas pendentes");
         int statusEscolhido = scanner.nextInt();
         scanner.nextLine();
     
@@ -289,7 +318,7 @@ class CrudDespesa {
         System.out.println("Escolha a data de fim do período\n(AAAA-MM-DD):");
         String fimPeriodo = scanner.nextLine();
     
-        System.out.println("Despesas filtradas:");
+        System.out.println("Listando despesas...:");
         for (Despesa despesa : listaDespesas) {
             boolean statusCorreto = false;
     
@@ -346,7 +375,13 @@ class CrudDespesa {
         Scanner scanner = new Scanner(System.in);
         System.out.println("----- EXCLUIR DESPESA -----");
 
-        System.out.println("Insira o número da despesa a excluir (1-" + listaDespesas.size() + "):");
+        if (listaDespesas.isEmpty()) {
+            System.out.println("Não há despesas para excluir.");
+            return;
+        }
+        System.out.println("Insira o número da despesa a excluir:\n:");
+        for (int i = 0; i < listaDespesas.size(); i++) {
+            System.out.println((i + 1) + ". " + listaDespesas.get(i));
         int despesaExcluir = scanner.nextInt();
 
         if (despesaExcluir > 0 && despesaExcluir <= listaDespesas.size()) {
@@ -357,11 +392,16 @@ class CrudDespesa {
         }
     }
 }
+}
 
 // Classe CRUD responsável pelo gerenciamento de usuarios.
 class CrudUsuario {
-    private List<String> users = new ArrayList<>();
+    List<User> users = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
+
+    public CrudUsuario() {
+        this.users = new ArrayList<>();
+    }
 
     // Método CRUD de criação de Usuarios.
     public void cadastrarUser() {
@@ -370,10 +410,12 @@ class CrudUsuario {
         System.out.println("Insira um nome de Login:");
         String login = scanner.nextLine();
 
-        System.out.println("Insira uma senha para o login" + login + ":");
+        System.out.println("Insira uma senha para o login " + login + ":");
         String senha = scanner.nextLine();
 
-        users.add(login + ":" + senha);
+        String senhaCriptografada = Criptografia.criptografar(senha);
+
+        users.add(new User(login, senhaCriptografada));
 
         System.out.println("Usuario " + login + " Cadastrado com Sucesso!");
     }
@@ -387,13 +429,15 @@ class CrudUsuario {
         scanner.nextLine();
                     
         System.out.println("Insira o novo Login do user: ");
-        String novologin = scanner.nextLine();
+        String novoLogin = scanner.nextLine();
 
         System.out.println("Insira a nova senha do user: ");
         String novaSenha = scanner.nextLine();
-                    
-        users.set(userEditar - 1, novologin + " " + novaSenha);
 
+        String novaSenhaCriptografada = Criptografia.criptografar(novaSenha);
+                    
+        users.set(userEditar - 1, new User(novoLogin, novaSenhaCriptografada));
+        
         System.out.println("Usuario atualizado!");
     }
 
@@ -406,8 +450,8 @@ class CrudUsuario {
             return;
         }
 
-        for (String usuario : users) {
-            System.out.println(usuario);
+        for (User user : users) {
+            System.out.println("Login: " + user.getLogin() + ", Senha: " + Criptografia.descriptografar(user.getSenha()));
         }
     }
 
@@ -415,7 +459,14 @@ class CrudUsuario {
     public void excluirUser() {
         System.out.println("----- EXCLUIR USUARIOS -----");
 
-        System.out.println("Insira o número do usuario a excluir (1-" + users.size() + "):");
+        if (users.isEmpty()) {
+            System.out.println("Não há usuarios para excluir.");
+            return;
+        }
+        System.out.println("Insira o número do usuario a excluir:");
+        for (int i = 0; i < users.size(); i++) {
+            System.out.println((i + 1) + ". " + users.get(i));
+        }
         int userExcluir = scanner.nextInt();
     
         if (userExcluir > 0 && userExcluir <= users.size()) {
@@ -431,17 +482,32 @@ class CrudUsuario {
 class Menu {
     private CrudDespesa crudDespesa;
     private CrudUsuario crudUsuario;
+    private Arquivo arquivo;
     Scanner scanner = new Scanner(System.in);
+
+    public Menu() {
+        this.crudDespesa = new CrudDespesa();
+        this.crudUsuario = new CrudUsuario();
+        this.arquivo = new Arquivo();
+    }
+
+    public void carregarArquivoDespesa() {
+        Arquivo.carregarArquivoDespesa(crudDespesa.listaDespesas);
+    }
+
+    public void carregarArquivoUser() {
+        Arquivo.carregarArquivoUser(crudUsuario.users);
+    }
 
     public void exibirMenuPrincipal() {
         int opcao;
             do {
-                System.out.println("----- MENU -----");
+                System.out.println("\n----- MENU -----");
                 System.out.println("1. Gerenciar Despesas");
                 System.out.println("2. Anotar Pagamento");
                 System.out.println("3. Gerenciar Usuários");
                 System.out.println("0. Sair");
-                System.out.print("Escolha uma opção: ");
+                System.out.print("Escolha uma opção:\n");
                 opcao = scanner.nextInt();
                 scanner.nextLine();
     
@@ -459,11 +525,13 @@ class Menu {
                         break;
     
                     case 0: // Sair
-                        System.out.println("Saindo!");
+                        Arquivo.salvarArquivoDespesa(crudDespesa.listaDespesas);
+                        Arquivo.salvarArquivoUser(crudUsuario.users);
+                        System.out.println("\nSalvando...\nSaindo, obrigado!");
                         break;
     
                     default:
-                        System.out.println("Opção inválida. Tente novamente!");
+                        System.out.println("\nOpção inválida. Tente novamente!");
                         break;
                 }
     
@@ -473,45 +541,54 @@ class Menu {
         }
         
         private void pagarDespesa() {
-            System.out.println("----- ANOTAR PAGAMENTO -----");
-            System.out.println("Insira o número da despesa a pagar (1-" + crudDespesa.listaDespesas.size() + "):");
+            System.out.println("\n----- ANOTAR PAGAMENTO -----");
+            System.out.println("Insira o número da despesa a pagar:\n");
+            for (int i = 0; i < crudDespesa.listaDespesas.size(); i++) {
+                Despesa despesa = crudDespesa.listaDespesas.get(i);
+                System.out.println((i + 1) + ". " + despesa);
+                }
             int despesaPagar = scanner.nextInt();
-            scanner.nextLine(); // Consumir a nova linha deixada pelo nextInt()
-            crudDespesa.pagarDespesa(despesaPagar - 1); // Ajusta o índice para base zero
+            scanner.nextLine();
+            crudDespesa.pagarDespesa(despesaPagar - 1);
         }
 
         private void gerenciarDespesas() {
             int submenu;
     
             do {
-                System.out.println("----- GERENCIAR DESPESAS -----");
-                System.out.println("1. Editar Despesa");
-                System.out.println("2. Excluir Despesa");
-                System.out.println("3. Relatório de Despesas");
+                System.out.println("\n----- GERENCIAR DESPESAS -----");
+                System.out.println("1. Criar Despesa");
+                System.out.println("2. Editar Despesa");
+                System.out.println("3. Excluir Despesa");
+                System.out.println("4. Relatório de Despesas");
                 System.out.println("0. Voltar ao Menu Principal");
-                System.out.print("Escolha uma opção: ");
+                System.out.print("Escolha uma opção:\n");
                 submenu = scanner.nextInt();
                 scanner.nextLine();
     
                 switch (submenu) {
-                    case 1: // Editar Despesa.
+                    case 1: // Criar Despesa.
+                        crudDespesa.criarDespesa();
+                        break;
+
+                    case 2: // Editar Despesa.
                         crudDespesa.editarDespesa();
                         break;
     
-                    case 2: // Excluir Despesa.
+                    case 3: // Excluir Despesa.
                         crudDespesa.excluirDespesa();
                         break;
     
-                    case 3: // Relatório de Despesas.
+                    case 4: // Relatório de Despesas.
                         crudDespesa.listarDespesas();
                         break;
     
                     case 0: // Sair
-                        System.out.println("Voltando ao Menu Principal!");
+                        System.out.println("\nVoltando ao Menu Principal!");
                         break;
     
                     default:
-                        System.out.println("Opção inválida. Tente novamente!");
+                        System.out.println("\nOpção inválida. Tente novamente!\n");
                         break;
                 }
     
@@ -522,13 +599,13 @@ class Menu {
             int submenuUsuario;
     
             do {
-                System.out.println("----- GERENCIAR USUÁRIOS -----");
+                System.out.println("\n----- GERENCIAR USUÁRIOS -----");
                 System.out.println("1. Cadastrar Usuário");
                 System.out.println("2. Editar Usuário");
                 System.out.println("3. Listar Usuários");
                 System.out.println("4. Excluir Usuário");
                 System.out.println("0. Voltar ao Menu Principal");
-                System.out.print("Escolha uma opção: ");
+                System.out.print("Escolha uma opção:\n");
                 submenuUsuario = scanner.nextInt();
                 scanner.nextLine();
     
@@ -550,11 +627,11 @@ class Menu {
                         break;
     
                     case 0: // Sair.
-                        System.out.println("Voltando ao Menu Principal!");
+                        System.out.println("\nVoltando ao Menu Principal!");
                         break;
     
                     default:
-                        System.out.println("Opção inválida. Tente novamente!");
+                        System.out.println("\nOpção inválida. Tente novamente!\n");
                         break;
                 }
     
@@ -562,5 +639,146 @@ class Menu {
         }
 }
 
-//
+// Classe Criptografia responsável pelos métodos de criptografia e descriptografia de senha de usuarios.
+class Criptografia {  
+    public static String criptografar(String senha) {
+        StringBuilder senhaCriptografada = new StringBuilder();
+            for (char c : senha.toCharArray()) {
+                senhaCriptografada.append((char) (c + 3));
+            }
+            return senhaCriptografada.toString();
+    }
 
+    public static String descriptografar(String senha) {
+        StringBuilder senhaDescriptografada = new StringBuilder();
+        for (char c : senha.toCharArray()) {
+            senhaDescriptografada.append((char) (c - 3));
+        }
+        return senhaDescriptografada.toString();
+    }
+}
+
+// Classe Arqvuivo responsavel pelos métodos de carregar e salvar um arquivo.
+class Arquivo {
+    public static void salvarArquivoDespesa(List<Despesa> listaDespesas) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("despesas.txt"));
+            for (Despesa d : listaDespesas) {
+                writer.write("Despesa{" +
+                "descricao='" + d.getDescricao() + '\'' +
+                ", valor=" + d.getValor() +
+                ", dataVencimento='" + d.getDataVencimento() + '\'' +
+                ", categoria='" + d.getCategoria() + '\'' +
+                ", statusPagamento=" + d.getStatusPagamento() +
+                '}' + System.lineSeparator());
+            }
+            System.out.println("Despesas salvas com sucesso!");
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o arquivo de despesas.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void salvarArquivoUser(List<User> users) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("usuarios.txt")); 
+            for (User user : users) {
+                writer.write(user.getLogin() + ";" + user.getSenha());
+                writer.newLine();
+            }
+            System.out.println("Usuários salvos com sucesso!");
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o arquivo de usuario.");
+            e.printStackTrace();
+        }
+    }
+
+    // CORRIGIR METODO CONSTRUTOR QUE ACUSA ERRO
+    public static void carregarArquivoDespesa(List<Despesa> listaDespesas) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("../despesas.txt"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.equals("***DESPESA***")) {
+                    String descricao = reader.readLine();
+                    Float valor = Float.parseFloat(reader.readLine());
+                    String dataVencimento = reader.readLine();
+                    String categoria = reader.readLine();
+                    boolean statusPagamento = Boolean.parseBoolean(reader.readLine());
+    
+                    Despesa despesa;
+
+                    switch (categoria) {
+                        case "Alimentacao":
+                            despesa = new Alimentacao(descricao, valor, dataVencimento, statusPagamento);
+                            break;
+                        case "Transporte":
+                            despesa = new Transporte(descricao, valor, dataVencimento, statusPagamento);
+                            break;
+                        case "Moradia":
+                            despesa = new Moradia(descricao, valor, dataVencimento, statusPagamento);
+                            break;
+                        case "Lazer":
+                            despesa = new Lazer(descricao, valor, dataVencimento, statusPagamento);
+                            break;
+                        case "Saude":
+                            despesa = new Saude(descricao, valor, dataVencimento, statusPagamento);
+                            break;
+                        case "Outros":
+                            despesa = new Outros(descricao, valor, dataVencimento, statusPagamento);
+                            break;
+                        default:
+                            System.err.println("Categoria desconhecida: " + categoria);
+                            continue;
+                    }
+                    if (despesa != null) {
+                        despesa.setStatusPagamento(statusPagamento);
+                        listaDespesas.add(despesa);
+                    }
+                }
+            }
+            reader.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("\"Arquivo não encontrado.\"");   
+        } catch (IOException e) {
+            System.err.println("\"Erro ao ler o arquivo de despesas.\"");
+            e.printStackTrace();
+        }
+    }
+
+    public static void carregarArquivoUser(List<User> users) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("../usuarios.txt"));
+            String line;
+        
+            while ((line = reader.readLine()) != null) {
+                if (line.equals("***USUARIO***")) {
+                    String login = reader.readLine();
+                    String senha = reader.readLine();
+                    
+                    if (login != null && senha != null) {
+                        users.add(new User(login, senha));
+                    }
+                }
+            }
+            reader.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("\"Arquivo não encontrado.\""); 
+        } catch (IOException e) {
+            System.err.println("\"Erro ao ler o arquivo de usuario.\"");
+            e.printStackTrace();
+        }
+    }
+}
+
+// Classe que possui o método MAIN, onde todo o fluxo acontece
+class DespesaMain {
+    public static void main(String[] args) {
+        Menu menu = new Menu();
+        menu.carregarArquivoDespesa();
+        menu.carregarArquivoUser();
+        menu.exibirMenuPrincipal();
+    }
+}
