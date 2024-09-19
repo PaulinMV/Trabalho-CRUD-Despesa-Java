@@ -1,1 +1,3 @@
-Despesa{descricao='busao', valor=500.0, dataVencimento='2024-09-15', categoria='Transporte', statusPagamento=false}
+Despesa{descricao='teste1', valor=500.0, dataVencimento='2024-09-18', categoria='Outros', statusPagamento=false}
+Despesa{descricao='lanche top', valor=50.0, dataVencimento='2024-09-18', categoria='Alimentação', statusPagamento=false}
+Despesa{descricao='gasolina carro', valor=150.0, dataVencimento='2024-09-18', categoria='Transporte', statusPagamento=true}

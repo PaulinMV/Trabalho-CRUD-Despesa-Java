@@ -302,7 +302,7 @@ class CrudDespesa {
     }
 
     // Método CRUD para listar despesas por status de pagamento e dentro de um período específico.
-    public void listarDespesas() { 
+    public void listarDespesas() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("----- LISTAR DESPESAS -----");
 
@@ -311,28 +311,28 @@ class CrudDespesa {
         System.out.println("2. Listar apenas despesas pendentes");
         int statusEscolhido = scanner.nextInt();
         scanner.nextLine();
-    
+
         System.out.println("Escolha a data de início do período\n(AAAA-MM-DD):");
         String inicioPeriodo = scanner.nextLine();
-    
+
         System.out.println("Escolha a data de fim do período\n(AAAA-MM-DD):");
         String fimPeriodo = scanner.nextLine();
-    
+
         System.out.println("Listando despesas...:");
         for (Despesa despesa : listaDespesas) {
             boolean statusCorreto = false;
-    
+
             // Verifica se o status de pagamento corresponde ao escolhido.
             if (statusEscolhido == 1 && despesa.getStatusPagamento() == true) {  // Status pagamento == Pagas
                 statusCorreto = true;
             } else if (statusEscolhido == 2 && despesa.getStatusPagamento() == false) { // Status pagamento == Pendentes
                 statusCorreto = true;
             }
-    
+
             // Verifica se a despesa está dentro do período escolhido.
             if (statusCorreto) {
                 String dataVencimento = despesa.getDataVencimento();
-    
+
                 // Verificador do início do período.
                 boolean dataDentroDoPeriodo = true;
                 if (dataVencimento.length() >= inicioPeriodo.length()) {
@@ -347,7 +347,7 @@ class CrudDespesa {
                 } else {
                     dataDentroDoPeriodo = false;
                 }
-    
+
                 // Verificador do fim do período.
                 if (dataDentroDoPeriodo && dataVencimento.length() >= fimPeriodo.length()) {
                     for (int i = 0; i < fimPeriodo.length(); i++) {
@@ -361,15 +361,15 @@ class CrudDespesa {
                 } else {
                     dataDentroDoPeriodo = false;
                 }
-    
-               
+
+
                 if (dataDentroDoPeriodo) {
                     System.out.println(despesa);
                 }
             }
         }
     }
-    
+
     // Método CRUD de exclusão de Despesa de acordo com a despesa selecionada
     public void excluirDespesa() {
         Scanner scanner = new Scanner(System.in);
@@ -420,7 +420,7 @@ class CrudUsuario {
         System.out.println("Usuario " + login + " Cadastrado com Sucesso!");
     }
 
-    // Método CRUD para edição de Usuarios.  
+    // Método CRUD para edição de Usuarios.
     public void editarUser() {
         System.out.println("----- EDITAR USUARIOS -----");
 
@@ -539,7 +539,7 @@ class Menu {
     
             scanner.close();
         }
-        
+
         private void pagarDespesa() {
             System.out.println("\n----- ANOTAR PAGAMENTO -----");
             System.out.println("Insira o número da despesa a pagar:\n");
@@ -640,7 +640,7 @@ class Menu {
 }
 
 // Classe Criptografia responsável pelos métodos de criptografia e descriptografia de senha de usuarios.
-class Criptografia {  
+class Criptografia {
     public static String criptografar(String senha) {
         StringBuilder senhaCriptografada = new StringBuilder();
             for (char c : senha.toCharArray()) {
@@ -682,34 +682,38 @@ class Arquivo {
 
     public static void salvarArquivoUser(List<User> users) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("usuarios.txt")); 
+            BufferedWriter writer = new BufferedWriter(new FileWriter("usuarios.txt"));
             for (User user : users) {
-                writer.write(user.getLogin() + ";" + user.getSenha());
-                writer.newLine();
+                writer.write(user.getLogin());  // Escreve o login
+                writer.newLine();  // Nova linha
+                writer.write(user.getSenha());  // Escreve a senha
+                writer.newLine();  // Nova linha
             }
             System.out.println("Usuários salvos com sucesso!");
             writer.close();
         } catch (IOException e) {
-            System.out.println("Erro ao salvar o arquivo de usuario.");
+            System.out.println("Erro ao salvar o arquivo de usuário.");
             e.printStackTrace();
         }
     }
 
-    // CORRIGIR METODO CONSTRUTOR QUE ACUSA ERRO
     public static void carregarArquivoDespesa(List<Despesa> listaDespesas) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("../despesas.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("despesas.txt"));
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.equals("***DESPESA***")) {
-                    String descricao = reader.readLine();
-                    Float valor = Float.parseFloat(reader.readLine());
-                    String dataVencimento = reader.readLine();
-                    String categoria = reader.readLine();
-                    boolean statusPagamento = Boolean.parseBoolean(reader.readLine());
-    
-                    Despesa despesa;
+                if (line.startsWith("Despesa{")) {
 
+                    String descricao = line.substring(line.indexOf("descricao='") + 10, line.indexOf("', valor="));
+                    String valorStr = line.substring(line.indexOf("valor=") + 6, line.indexOf(", dataVencimento='"));
+                    Float valor = Float.parseFloat(valorStr);
+                    String dataVencimento = line.substring(line.indexOf("dataVencimento='") + 16, line.indexOf("', categoria="));
+                    String categoria = line.substring(line.indexOf("categoria='") + 11, line.indexOf("', statusPagamento="));
+                    String statusPagamentoStr = line.substring(line.indexOf("statusPagamento=") + 16, line.indexOf("}"));
+                    boolean statusPagamento = Boolean.parseBoolean(statusPagamentoStr);
+
+
+                    Despesa despesa;
                     switch (categoria) {
                         case "Alimentacao":
                             despesa = new Alimentacao(descricao, valor, dataVencimento, statusPagamento);
@@ -740,37 +744,37 @@ class Arquivo {
                 }
             }
             reader.close();
+            System.out.println("Despesas carregadas com sucesso!");
         } catch (FileNotFoundException e) {
-            System.err.println("\"Arquivo não encontrado.\"");   
+            System.err.println("Arquivo não encontrado.");
         } catch (IOException e) {
-            System.err.println("\"Erro ao ler o arquivo de despesas.\"");
+            System.err.println("Erro ao ler o arquivo de despesas.");
             e.printStackTrace();
         }
     }
 
     public static void carregarArquivoUser(List<User> users) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("../usuarios.txt"));
-            String line;
-        
-            while ((line = reader.readLine()) != null) {
-                if (line.equals("***USUARIO***")) {
-                    String login = reader.readLine();
-                    String senha = reader.readLine();
-                    
-                    if (login != null && senha != null) {
-                        users.add(new User(login, senha));
-                    }
+            BufferedReader reader = new BufferedReader(new FileReader("usuarios.txt"));
+            String login;
+
+            while ((login = reader.readLine()) != null) {
+                String senha = reader.readLine();
+
+                if (login != null && senha != null) {
+                    users.add(new User(login, senha));
                 }
             }
             reader.close();
+            System.out.println("Usuários carregados com sucesso!");
         } catch (FileNotFoundException e) {
-            System.err.println("\"Arquivo não encontrado.\""); 
+            System.err.println("Arquivo não encontrado.");
         } catch (IOException e) {
-            System.err.println("\"Erro ao ler o arquivo de usuario.\"");
+            System.err.println("Erro ao ler o arquivo de usuário.");
             e.printStackTrace();
         }
     }
+
 }
 
 // Classe que possui o método MAIN, onde todo o fluxo acontece
